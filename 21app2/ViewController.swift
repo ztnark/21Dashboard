@@ -35,27 +35,31 @@ class ViewController: UIViewController {
         
         
         if let test : AnyObject? = defaults.objectForKey("test") {
+            print(test)
             if (test != nil && test!.count > 0){
                 var endpoints = defaults.objectForKey("test") as! NSArray
                 print("here")
                 let url = endpoints[0] as! String
                 
             }else{
-//                var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
-//                
-//                alert.addTextFieldWithConfigurationHandler { (textField) in
-//                    textField.placeholder = "Endpoint"
-//                }
-//                
-//                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
-//                    let textf = alert.textFields![0] as UITextField
-//                    let url = textf.text!
-//                    
-//                }))
-//                
-//                self.presentViewController(alert, animated: true, completion: nil)
+                var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
                 
-                self.get21Data("http://205.178.81.58:3456/dashboard")
+                alert.addTextFieldWithConfigurationHandler { (textField) in
+                    textField.placeholder = "Endpoint"
+                }
+                
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
+                    let textf = alert.textFields![0] as UITextField
+                    let url = textf.text!
+                    endArr.append(url)
+                    defaults.setObject(endArr, forKey: "test")
+                    self.get21Data(url)
+                    
+                }))
+                
+                self.presentViewController(alert, animated: true, completion: nil)
+                
+                
 
             }
         }

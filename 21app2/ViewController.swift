@@ -40,7 +40,7 @@ class ViewController: UIViewController {
                 var endpoints = defaults.objectForKey("test") as! NSArray
                 print("here")
                 let url = endpoints[0] as! String
-                
+                self.get21Data(url)
             }else{
                 var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
                 

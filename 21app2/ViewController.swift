@@ -24,8 +24,14 @@ class ViewController: UIViewController {
     @IBOutlet var onchainBtn: UIButton!
     @IBOutlet var offchainBtn: UIButton!
     @IBOutlet var flushingBtn: UIButton!
+    @IBOutlet var mineBtn: UIButton!
+    @IBOutlet var flushBtn: UIButton!
+    var splashScreen: UIImageView?
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.splashScreen = UIImageView(image: UIImage(named: "21splash"))
+       UIApplication.sharedApplication().windows[0].addSubview(splashScreen!)
 
         
         let defaults = NSUserDefaults.standardUserDefaults()
@@ -104,7 +110,7 @@ class ViewController: UIViewController {
                 self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                 var qrCode = QRCode(json["status_account"]["address"].stringValue)
                 self.qrImage.image = qrCode?.image
-                
+                self.splashScreen!.removeFromSuperview()
             }
         }
 
@@ -142,6 +148,59 @@ class ViewController: UIViewController {
         flushingBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
     }
     
+    @IBAction func mine(sender: AnyObject) {
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        Alamofire.request(.GET, "http://205.178.81.58:3456/mine", headers: headers).responseJSON { response in
+            print(response.request)  // original URL request
+            print(response.response) // URL response
+            print(response.data)     // server data
+            print(response.result)   // result of response serialization
+            
+            if let value = response.result.value {
+                let json = JSON(value)
+                print("JSON: \(json)")
+                self.addressLabel.text = json["status_account"]["address"].stringValue
+                self.onchainLabel.text = json["status_wallet"]["onchain"].stringValue
+                self.offchainLabel.text = json["status_wallet"]["twentyone_balance"].stringValue
+                self.flushingLabel.text = json["status_wallet"]["flushing"].stringValue
+                self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
+                var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                self.qrImage.image = qrCode?.image
+                
+            }
+
+        }
+    }
+
+    @IBAction func flush(sender: AnyObject) {
+        let headers = [
+            "Content-Type": "application/json"
+        ]
+        Alamofire.request(.GET, "http://205.178.81.58:3456/flush", headers: headers).responseJSON { response in
+            print(response.request)  // original URL request
+            print(response.response) // URL response
+            print(response.data)     // server data
+            print(response.result)   // result of response serialization
+            
+            if let value = response.result.value {
+                let json = JSON(value)
+                print("JSON: \(json)")
+                self.addressLabel.text = json["status_account"]["address"].stringValue
+                self.onchainLabel.text = json["status_wallet"]["onchain"].stringValue
+                self.offchainLabel.text = json["status_wallet"]["twentyone_balance"].stringValue
+                self.flushingLabel.text = json["status_wallet"]["flushing"].stringValue
+                self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
+                var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                self.qrImage.image = qrCode?.image
+                
+            }
+
+        }
+
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -149,16 +208,16 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(animated: Bool) {
         //self.navigationController?.navigationBar.tintColor = UIColor.whiteColor();
-        var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 150, height: 27))
-        var image = UIImage(named:"TextLogo.png")
-        var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 150, height: 27))
+        var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 35, height: 35))
+        var image = UIImage(named:"21co.png")
+        var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 35, height: 35))
         imageView.image = image
         
         headerView.addSubview(imageView)
         
         self.navigationItem.titleView = headerView
         
-        navigationController?.navigationBar.barTintColor = UIColor(rgba: "#EF3131")
+        navigationController?.navigationBar.barTintColor = UIColor(rgba: "#000")
             //UIColor(colorLiteralRed: 205.0/255.0, green: 0.0/255.0, blue: 15.0/255.0, alpha: 1.0)
         
         self.navigationController?.navigationBar.translucent = false

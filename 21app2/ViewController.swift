@@ -48,6 +48,7 @@ class ViewController: UIViewController {
                 let url = endpoints[0] as! String
                 self.get21Data(url)
             }else{
+                self.splashScreen!.removeFromSuperview()
                 var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
                 
                 alert.addTextFieldWithConfigurationHandler { (textField) in
@@ -208,9 +209,9 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(animated: Bool) {
         //self.navigationController?.navigationBar.tintColor = UIColor.whiteColor();
-        var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 35, height: 35))
+        var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 40, height: 40))
         var image = UIImage(named:"21co.png")
-        var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 35, height: 35))
+        var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
         imageView.image = image
         
         headerView.addSubview(imageView)

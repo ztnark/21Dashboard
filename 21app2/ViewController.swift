@@ -27,68 +27,20 @@ class ViewController: UIViewController {
     @IBOutlet var mineBtn: UIButton!
     @IBOutlet var flushBtn: UIButton!
     var splashScreen: UIImageView?
+    var numberFormatter = NSNumberFormatter()
+    
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
         self.splashScreen = UIImageView(image: UIImage(named: "21splash"))
-       UIApplication.sharedApplication().windows[0].addSubview(splashScreen!)
+       self.view.addSubview(splashScreen!)
 
         
-        let defaults = NSUserDefaults.standardUserDefaults()
-        var endArr: [NSString] = [NSString]()
-        var test = []
-        var url = ""
-        
-        
-        if let test : AnyObject? = defaults.objectForKey("test") {
-            print(test)
-            if (test != nil && test!.count > 0){
-                var endpoints = defaults.objectForKey("test") as! NSArray
-                print("here")
-                let url = endpoints[0] as! String
-                self.get21Data(url)
-            }else{
-                self.splashScreen!.removeFromSuperview()
-                var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
-                
-                alert.addTextFieldWithConfigurationHandler { (textField) in
-                    textField.placeholder = "Endpoint"
-                }
-                
-                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
-                    let textf = alert.textFields![0] as UITextField
-                    let url = textf.text!
-                    endArr.append(url)
-                    defaults.setObject(endArr, forKey: "test")
-                    self.get21Data(url)
-                    
-                }))
-                
-                self.presentViewController(alert, animated: true, completion: nil)
-                
-                
-
-            }
-        }
-        
-//        if test.count == 0 {
-//             var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
-//        
-//            alert.addTextFieldWithConfigurationHandler { (textField) in
-//                textField.placeholder = "Endpoint"
-//            }
-//
-//            alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
-//                let textf = alert.textFields![0] as UITextField
-//                endArr.append(textf.text!)
-//            }))
-//        
-//            self.presentViewController(alert, animated: true, completion: nil)
-//        }
-        
-        //endArr.append("http://205.178.81.58:3456/dashboard")
-        // Do any additional setup after loading the view, typically from a nib.
     }
+    
     
     func get21Data(url: String){
         let headers = [
@@ -104,10 +56,12 @@ class ViewController: UIViewController {
             if let value = response.result.value {
                 let json = JSON(value)
                 print("JSON: \(json)")
+                
+
                 self.addressLabel.text = json["status_account"]["address"].stringValue
-                self.onchainLabel.text = json["status_wallet"]["onchain"].stringValue
-                self.offchainLabel.text = json["status_wallet"]["twentyone_balance"].stringValue
-                self.flushingLabel.text = json["status_wallet"]["flushing"].stringValue
+                self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
+                self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
+                self.flushingLabel.text =  self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
                 self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                 var qrCode = QRCode(json["status_account"]["address"].stringValue)
                 self.qrImage.image = qrCode?.image
@@ -163,9 +117,9 @@ class ViewController: UIViewController {
                 let json = JSON(value)
                 print("JSON: \(json)")
                 self.addressLabel.text = json["status_account"]["address"].stringValue
-                self.onchainLabel.text = json["status_wallet"]["onchain"].stringValue
-                self.offchainLabel.text = json["status_wallet"]["twentyone_balance"].stringValue
-                self.flushingLabel.text = json["status_wallet"]["flushing"].stringValue
+                self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
+                self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
+                self.flushingLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
                 self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                 var qrCode = QRCode(json["status_account"]["address"].stringValue)
                 self.qrImage.image = qrCode?.image
@@ -222,6 +176,43 @@ class ViewController: UIViewController {
             //UIColor(colorLiteralRed: 205.0/255.0, green: 0.0/255.0, blue: 15.0/255.0, alpha: 1.0)
         
         self.navigationController?.navigationBar.translucent = false
+        
+        let defaults = NSUserDefaults.standardUserDefaults()
+        var endArr: [NSString] = [NSString]()
+        var test = []
+        var url = ""
+
+        if let test : AnyObject? = defaults.objectForKey("test") {
+            print(test)
+            if (test != nil && test!.count > 0){
+                var endpoints = defaults.objectForKey("test") as! NSArray
+                print("here")
+                let url = endpoints[0] as! String
+                self.get21Data(url)
+            }else{
+                self.splashScreen!.removeFromSuperview()
+                var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
+                
+                alert.addTextFieldWithConfigurationHandler { (textField) in
+                    textField.placeholder = "Endpoint"
+                }
+                
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
+                    let textf = alert.textFields![0] as UITextField
+                    let url = textf.text!
+                    endArr.append(url)
+                    defaults.setObject(endArr, forKey: "test")
+                    self.get21Data(url)
+                    
+                }))
+                print("there");
+                self.presentViewController(alert, animated: true, completion: nil)
+                
+                
+                
+            }
+        }
+
     }
 
 

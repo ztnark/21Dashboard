@@ -145,7 +145,7 @@
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="htw-lD-AqG">
                                 <rect key="frame" x="136" y="530" width="328" height="22"/>
-                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="16"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="34.5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c5n-Du-dsi">
@@ -266,7 +266,7 @@
                                 </variation>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I3F-H3-QQa">
-                                <rect key="frame" x="20" y="24" width="16" height="22"/>
+                                <rect key="frame" x="57" y="24" width="16" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="CGV-Rw-st8"/>
                                     <constraint firstAttribute="width" constant="16" id="yh4-SN-UdR"/>
@@ -276,8 +276,19 @@
                                     <action selector="flush:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WGK-W2-2t5"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yjv-un-6Ih">
+                                <rect key="frame" x="20" y="24" width="22" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="22" id="579-6t-iOs"/>
+                                    <constraint firstAttribute="height" constant="22" id="dzQ-9j-8j0"/>
+                                </constraints>
+                                <state key="normal" image="settings"/>
+                                <connections>
+                                    <action selector="settings:" destination="BYZ-38-t0r" eventType="touchUpInside" id="r36-VE-guA"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wq0-F5-Orp">
-                                <rect key="frame" x="49" y="24" width="22" height="22"/>
+                                <rect key="frame" x="88" y="24" width="22" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="22" id="02b-CR-ZFj"/>
                                     <constraint firstAttribute="height" constant="22" id="WKp-Ef-4fc"/>
@@ -293,6 +304,7 @@
                             <constraint firstItem="ALD-sF-ayv" firstAttribute="top" secondItem="1qC-BY-dEW" secondAttribute="bottom" constant="17" id="0UY-cp-bVR"/>
                             <constraint firstItem="p9i-Qe-hT9" firstAttribute="leading" secondItem="m7w-dx-s1K" secondAttribute="trailing" constant="68" id="440-yW-85M"/>
                             <constraint firstItem="m7w-dx-s1K" firstAttribute="top" secondItem="1qC-BY-dEW" secondAttribute="bottom" constant="-82" id="45K-RW-7yY"/>
+                            <constraint firstItem="Yjv-un-6Ih" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="4Lg-Fk-R9e"/>
                             <constraint firstAttribute="trailingMargin" secondItem="wL3-xa-JFN" secondAttribute="trailing" constant="24" id="4a0-dR-zA3"/>
                             <constraint firstItem="oAQ-3p-F1A" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6mB-3b-g2X"/>
                             <constraint firstItem="wL3-xa-JFN" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="8kQ-KW-4Q0"/>
@@ -337,9 +349,11 @@
                             <constraint firstItem="p9i-Qe-hT9" firstAttribute="top" secondItem="wL3-xa-JFN" secondAttribute="bottom" constant="8" id="nDI-e5-7V4"/>
                             <constraint firstItem="c5n-Du-dsi" firstAttribute="top" secondItem="oAQ-3p-F1A" secondAttribute="bottom" constant="17" id="nPr-q5-hR7"/>
                             <constraint firstItem="gyK-1H-ekz" firstAttribute="leading" secondItem="wq0-F5-Orp" secondAttribute="trailing" constant="8" id="oJD-eI-QpC"/>
+                            <constraint firstItem="Yjv-un-6Ih" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="om8-8i-Mex"/>
                             <constraint firstItem="1qC-BY-dEW" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="ook-EH-0GE"/>
                             <constraint firstItem="htw-lD-AqG" firstAttribute="top" secondItem="ALD-sF-ayv" secondAttribute="bottom" constant="15" id="pGM-9S-H1W"/>
                             <constraint firstItem="oAQ-3p-F1A" firstAttribute="top" secondItem="htw-lD-AqG" secondAttribute="bottom" constant="16" id="pfV-vH-Tnt"/>
+                            <constraint firstItem="I3F-H3-QQa" firstAttribute="leading" secondItem="Yjv-un-6Ih" secondAttribute="trailing" constant="16" id="quz-3a-TUY"/>
                             <constraint firstItem="I3F-H3-QQa" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="smT-Cu-HS9"/>
                             <constraint firstItem="AQe-6N-ENy" firstAttribute="centerX" secondItem="1qC-BY-dEW" secondAttribute="centerX" id="spJ-Hi-TMR"/>
                             <constraint firstItem="ALD-sF-ayv" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="t83-qr-aFi"/>
@@ -356,6 +370,7 @@
                             <mask key="constraints">
                                 <exclude reference="FTd-rf-FKr"/>
                                 <exclude reference="ook-EH-0GE"/>
+                                <exclude reference="bH9-fq-32v"/>
                                 <exclude reference="QQe-WU-1dE"/>
                                 <exclude reference="SiS-i1-Y1X"/>
                                 <exclude reference="d4i-zt-7rB"/>
@@ -404,7 +419,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="240" y="348"/>
+            <point key="canvasLocation" x="221" y="309"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="qMq-Ih-wca">
@@ -774,7 +789,7 @@
                                 </constraints>
                                 <color key="textColor" red="0.0" green="0.83921568629999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="50"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                                 <variation key="default">
                                     <mask key="constraints">
                                         <exclude reference="8th-jV-XGT"/>
@@ -846,6 +861,7 @@
         <image name="headerBg" width="1242" height="509"/>
         <image name="line" width="787" height="2"/>
         <image name="send" width="85" height="55"/>
+        <image name="settings" width="256" height="256"/>
         <image name="toilet2" width="364" height="610"/>
     </resources>
 </document>

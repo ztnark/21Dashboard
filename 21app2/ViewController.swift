@@ -14,6 +14,11 @@ import UIColor_Hex_Swift
 import SwiftyJSON
 import QRCode
 
+struct MyVariables {
+    static var url = ""
+    static var auth = ""
+}
+
 class ViewController: UIViewController {
     @IBOutlet var qrImage: UIImageView!
     @IBOutlet var addressLabel: UILabel!
@@ -28,15 +33,27 @@ class ViewController: UIViewController {
     @IBOutlet var flushBtn: UIButton!
     var splashScreen: UIImageView?
     var numberFormatter = NSNumberFormatter()
+    var alamoFireManager : Alamofire.Manager?
+    var url = ""
+    var auth = ""
     
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        var screenRect = UIScreen.mainScreen().bounds
+        var screenWidth = screenRect.size.width
+        var screenHeight = screenRect.size.height
+        
         numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
-        self.splashScreen = UIImageView(image: UIImage(named: "21splash"))
+        self.splashScreen = UIImageView(image: UIImage(named: "SplashScreen"))
+        
+        self.splashScreen?.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
        self.view.addSubview(splashScreen!)
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.timeoutIntervalForRequest = 30 // seconds
+        self.alamoFireManager = Alamofire.Manager(configuration: configuration)
 
         
     }
@@ -46,30 +63,47 @@ class ViewController: UIViewController {
         let headers = [
             "Content-Type": "application/json"
         ]
-        Alamofire.request(.GET, url, headers: headers).responseJSON { response in
-            print(response.request)  // original URL request
-            print(response.response) // URL response
-            print(response.data)     // server data
-            print(response.result)   // result of response serialization
-            
-            
+        //LoadingOverlay.shared.showOverlay(self.view)
+        print(MyVariables.auth)
+        self.alamoFireManager!.request(.GET, MyVariables.url + "/dashboard", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
+            switch response.result {
+            case .Success(let data):
+            //LoadingOverlay.shared.hideOverlayView()
             if let value = response.result.value {
                 let json = JSON(value)
                 print("JSON: \(json)")
-                
+                if response.response!.statusCode == 200 {
+                    self.addressLabel.text = json["status_account"]["address"].stringValue
+                    self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
+                    self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
+                    self.flushingLabel.text =  self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
+                    self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
+                    var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                    self.qrImage.image = qrCode?.image
+                    self.splashScreen!.removeFromSuperview()
 
-                self.addressLabel.text = json["status_account"]["address"].stringValue
-                self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
-                self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
-                self.flushingLabel.text =  self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
-                self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
-                var qrCode = QRCode(json["status_account"]["address"].stringValue)
-                self.qrImage.image = qrCode?.image
+                }
+                else if response.response!.statusCode == 401 {
+                    var text = json["text"].stringValue
+                    self.presentAlert(text)
+                    return
+                }
+            }
+            case .Failure(let error):
                 self.splashScreen!.removeFromSuperview()
+                print(error);
             }
         }
 
     }
+    
+    func presentAlert(alert: String){
+        let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+
 
     @IBAction func onchainaction(sender: AnyObject) {
         offchainLabel.hidden = true
@@ -107,23 +141,37 @@ class ViewController: UIViewController {
         let headers = [
             "Content-Type": "application/json"
         ]
-        Alamofire.request(.GET, "http://205.178.81.58:3456/mine", headers: headers).responseJSON { response in
+        LoadingOverlay.shared.showOverlay(self.view)
+        self.alamoFireManager!.request(.GET, MyVariables.url + "/mine", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
+            LoadingOverlay.shared.hideOverlayView()
+            switch response.result {
+            case .Success(let data):
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
             print(response.result)   // result of response serialization
-            
             if let value = response.result.value {
                 let json = JSON(value)
                 print("JSON: \(json)")
-                self.addressLabel.text = json["status_account"]["address"].stringValue
-                self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
-                self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
-                self.flushingLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
-                self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
-                var qrCode = QRCode(json["status_account"]["address"].stringValue)
-                self.qrImage.image = qrCode?.image
+                if response.response!.statusCode == 200 {
+                    self.addressLabel.text = json["status_account"]["address"].stringValue
+                    self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
+                    self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
+                    self.flushingLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
+                    self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
+                    var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                    self.qrImage.image = qrCode?.image
+                }
+                else if response.response!.statusCode == 401 {
+                    var text = json["text"].stringValue
+                    self.presentAlert(text)
+                    return
+                }
                 
+            }
+                
+            case .Failure(let error):
+                self.presentAlert(error.localizedDescription)
             }
 
         }
@@ -133,23 +181,32 @@ class ViewController: UIViewController {
         let headers = [
             "Content-Type": "application/json"
         ]
-        Alamofire.request(.GET, "http://205.178.81.58:3456/flush", headers: headers).responseJSON { response in
+        LoadingOverlay.shared.showOverlay(self.view)
+        self.alamoFireManager!.request(.GET, MyVariables.url + "/flush", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
             print(response.result)   // result of response serialization
+            LoadingOverlay.shared.hideOverlayView()
             
             if let value = response.result.value {
+                
                 let json = JSON(value)
                 print("JSON: \(json)")
-                self.addressLabel.text = json["status_account"]["address"].stringValue
-                self.onchainLabel.text = json["status_wallet"]["onchain"].stringValue
-                self.offchainLabel.text = json["status_wallet"]["twentyone_balance"].stringValue
-                self.flushingLabel.text = json["status_wallet"]["flushing"].stringValue
-                self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
-                var qrCode = QRCode(json["status_account"]["address"].stringValue)
-                self.qrImage.image = qrCode?.image
-                
+                if response.response!.statusCode == 200 {
+                    self.addressLabel.text = json["status_account"]["address"].stringValue
+                    self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
+                    self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
+                    self.flushingLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
+                    self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
+                    var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                    self.qrImage.image = qrCode?.image
+                }
+                else if response.response!.statusCode == 401 {
+                    var text = json["text"].stringValue
+                    self.presentAlert(text)
+                    return
+                }
             }
 
         }
@@ -180,39 +237,55 @@ class ViewController: UIViewController {
         let defaults = NSUserDefaults.standardUserDefaults()
         var endArr: [NSString] = [NSString]()
         var test = []
-        var url = ""
 
         if let test : AnyObject? = defaults.objectForKey("test") {
             print(test)
             if (test != nil && test!.count > 0){
                 var endpoints = defaults.objectForKey("test") as! NSArray
-                print("here")
-                let url = endpoints[0] as! String
-                self.get21Data(url)
+                MyVariables.url = endpoints[0] as! String
+                MyVariables.auth = endpoints[1] as! String
+                get21Data(url)
             }else{
                 self.splashScreen!.removeFromSuperview()
-                var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
-                
-                alert.addTextFieldWithConfigurationHandler { (textField) in
-                    textField.placeholder = "Endpoint"
-                }
-                
-                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
-                    let textf = alert.textFields![0] as UITextField
-                    let url = textf.text!
-                    endArr.append(url)
-                    defaults.setObject(endArr, forKey: "test")
-                    self.get21Data(url)
-                    
-                }))
-                print("there");
-                self.presentViewController(alert, animated: true, completion: nil)
-                
-                
-                
+                changePrefs()
             }
         }
 
+    }
+    
+    @IBAction func settings(sender: AnyObject) {
+        changePrefs()
+    }
+    func changePrefs(){
+        let defaults = NSUserDefaults.standardUserDefaults()
+        var endArr: [NSString] = [NSString]()
+        var test = []
+        
+        var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        alert.addTextFieldWithConfigurationHandler { (textField) in
+            textField.placeholder = "21 Endpoint"
+        }
+        
+        alert.addTextFieldWithConfigurationHandler { (textField) in
+            textField.secureTextEntry = true
+            textField.placeholder = "Authorization Code"
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
+            let textf = alert.textFields![0] as UITextField
+            let authf = alert.textFields![1] as UITextField
+            MyVariables.url = textf.text!
+            MyVariables.auth = authf.text!
+            endArr.append(MyVariables.url)
+            endArr.append(MyVariables.auth)
+            defaults.setObject(endArr, forKey: "test")
+            self.get21Data(MyVariables.url)
+            
+        }))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
 
 

@@ -16,16 +16,19 @@ import QRCode
 import QRCodeReader
 import AVFoundation
 
-class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate {
+class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, UITextFieldDelegate {
 
     @IBOutlet var amountField: UITextField!
     @IBOutlet var addressField: UITextField!
     
     var address = ""
+    var url = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        view.addGestureRecognizer(tap)
 
     }
 
@@ -44,17 +47,25 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate {
         let parameters : [String : AnyObject] = [
             "address": self.addressField.text!,
             "amount": amount!,
+            "code":MyVariables.auth,
         ]
         
-        Alamofire.request(.POST, "http://205.178.81.58:3456/send", parameters: parameters, encoding: .JSON, headers: headers).responseJSON { response in
+        LoadingOverlay.shared.showOverlay(self.view)
+        
+        Alamofire.request(.POST, MyVariables.url + "/send", parameters: parameters, encoding: .JSON, headers: headers).responseJSON { response in
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
             print(response.result)   // result of response serialization
+            LoadingOverlay.shared.hideOverlayView()
             
             if let value = response.result.value {
                 let json = JSON(value)
                 print("JSON: \(json)")
+                if response.response!.statusCode == 401 {
+                    var text = json["text"].stringValue
+                    self.presentAlert(text)
+                }
             }
             
         }
@@ -80,6 +91,19 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate {
         presentViewController(reader, animated: true, completion: nil)
     }
     
+    //Calls this function when the tap is recognized.
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
+    
+    func presentAlert(alert: String){
+        let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    
     // MARK: - QRCodeReader Delegate Methods
     
     func reader(reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
@@ -98,20 +122,22 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate {
     }
     
     override func viewDidAppear(animated: Bool) {
-//        //self.navigationController?.navigationBar.tintColor = UIColor.whiteColor();
-//        var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 150, height: 27))
-//        var image = UIImage(named:"TextLogo.png")
-//        var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 150, height: 27))
-//        imageView.image = image
-//        
-//        headerView.addSubview(imageView)
-//        
-//        self.navigationItem.titleView = headerView
-//        
-//        navigationController?.navigationBar.barTintColor = UIColor(rgba: "#EF3131")
-//        //UIColor(colorLiteralRed: 205.0/255.0, green: 0.0/255.0, blue: 15.0/255.0, alpha: 1.0)
-//        
-//        self.navigationController?.navigationBar.translucent = false
+        let defaults = NSUserDefaults.standardUserDefaults()
+        var endArr: [NSString] = [NSString]()
+        var test = []
+        
+        if let test : AnyObject? = defaults.objectForKey("test") {
+            if (test != nil && test!.count > 0){
+                var endpoints = defaults.objectForKey("test") as! NSArray
+                print("here")
+                self.url = endpoints[0] as! String
+            }
+        }
+    }
+    
+    func textFieldShouldReturn(textField: UITextField!) -> Bool {   //delegate method
+        textField.resignFirstResponder()
+        return true
     }
     
     

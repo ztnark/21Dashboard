@@ -259,7 +259,6 @@ class ViewController: UIViewController {
     func changePrefs(){
         let defaults = UserDefaults.standard
         var endArr: [NSString] = [NSString]()
-        var test = []
         
         let alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.alert)
         

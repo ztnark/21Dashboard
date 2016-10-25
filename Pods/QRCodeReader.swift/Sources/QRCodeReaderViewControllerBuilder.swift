@@ -30,53 +30,63 @@ import Foundation
  The QRCodeViewControllerBuilder aims to create a simple configuration object for
  the QRCode view controller.
  */
-public final class QRCodeViewControllerBuilder {
+public final class QRCodeReaderViewControllerBuilder {
   // MARK: - Configuring the QRCodeViewController Objects
 
   /**
-  The builder block.
-  The block gives a reference of builder you can configure.
-  */
-  public typealias QRCodeViewControllerBuilderBlock = (builder: QRCodeViewControllerBuilder) -> Void
+   The builder block.
+   The block gives a reference of builder you can configure.
+   */
+  public typealias QRCodeReaderViewControllerBuilderBlock = (QRCodeReaderViewControllerBuilder) -> Void
 
   /**
    The title to use for the cancel button.
    */
-  public var cancelButtonTitle: String = "Cancel"
+  public var cancelButtonTitle = "Cancel"
 
   /**
    The code reader object used to scan the bar code.
    */
-  public var reader: QRCodeReader = QRCodeReader()
+  public var reader = QRCodeReader()
+
+  /**
+   The reader container view used to display the video capture and the UI components.
+   */
+  public var readerView = QRCodeReaderContainer(displayable: QRCodeReaderView())
 
   /**
    Flag to know whether the view controller start scanning the codes when the view will appear.
    */
-  public var startScanningAtLoad: Bool = true
+  public var startScanningAtLoad = true
+
+  /**
+   Flag to display the cancel button.
+   */
+  public var showCancelButton = true
 
   /**
    Flag to display the switch camera button.
    */
-  public var showSwitchCameraButton: Bool = true
+  public var showSwitchCameraButton = true
 
   /**
    Flag to display the toggle torch button. If the value is true and there is no torch the button will not be displayed.
    */
-  public var showTorchButton: Bool = false
+  public var showTorchButton = false
 
   // MARK: - Initializing a Flap View
 
   /**
-  Initialize a QRCodeViewController builder with default values.
-  */
+   Initialize a QRCodeViewController builder with default values.
+   */
   public init() {}
 
   /**
-   Initialize a QRCodeViewController builder with default values.
+   Initialize a QRCodeReaderViewController builder with default values.
 
-   - parameter buildBlock: A QRCodeViewController builder block to configure itself.
+   - parameter buildBlock: A QRCodeReaderViewController builder block to configure itself.
    */
-  public init(@noescape buildBlock: QRCodeViewControllerBuilderBlock) {
-    buildBlock(builder: self)
+  public init(buildBlock: QRCodeReaderViewControllerBuilderBlock) {
+    buildBlock(self)
   }
 }

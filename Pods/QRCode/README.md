@@ -2,20 +2,21 @@
 
 [![Build Status](https://travis-ci.org/aschuch/QRCode.svg)](https://travis-ci.org/aschuch/QRCode)
 ![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)
+![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg)
 
 A QRCode generator written in Swift.
 
 ![QRCode Example](Resources/example.png)
 
-## Usage
+## Overview
 
-Create a new QRCode representing a `NSURL`, a string or arbitrary data.
+Create a new QRCode representing a `URL`, a string or arbitrary data.
 The following examples all result in the same QRCode image.
 
 ```swift
-// NSURL
-let url = NSURL(string: "http://schuch.me")
-qrCode = QRCode(url)
+// URL
+let url = URL(string: "http://schuch.me")!
+let qrCode = QRCode(url)
 qrCode?.image
 
 // String
@@ -23,7 +24,7 @@ let qrCode = QRCode("http://schuch.me")
 qrCode?.image
 
 // NSData
-let data = "http://schuch.me".dataUsingEncoding(NSISOLatin1StringEncoding)
+let data = "http://schuch.me".data(using: .isoLatin1)!
 let qrCode = QRCode(data)
 qrCode.image
 ```
@@ -51,7 +52,7 @@ qrCode.backgroundColor = CIColor(rgba: "000")
 qrCode.image // UIImage (green QRCode color and black background)
 ```
 
-> **Note**: The obove examples make use of the `CIColor` extension that ships with this project to create colors based on HEX strings. 
+> **Note**: The above examples make use of the `CIColor` extension that ships with this project to create colors based on HEX strings. 
 
 ### UIImageView extension
 
@@ -67,7 +68,19 @@ In case you love emoji as much as I do, make sure to create your `QRCode` instan
 
 ```swift
 let qrCode = 🔳("http://example.com")
-``` 
+```
+
+## Version Compatibility
+
+Current Swift compatibility breakdown:
+
+| Swift Version | Framework Version |
+| ------------- | ----------------- |
+| 3.0	        | master          	|
+| 2.3	        | 1.x          		|
+| 2.2           | 0.x          		|
+
+[all releases]: https://github.com/aschuch/QRCode/releases
 
 ## Installation
 
@@ -86,7 +99,7 @@ Then run `carthage update`.
 Add the following line to your Podfile.
 
 ```
-pod "QRCode", "~> 0.5"
+pod "QRCode"
 ```
 
 Then run `pod install` with Cocoapods 0.36 or newer.

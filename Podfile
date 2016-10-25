@@ -1,15 +1,15 @@
 # Uncomment this line to define a global platform for your project
- platform :ios, '8.0'
+ platform :ios, '10.0'
 # Uncomment this line if you're using Swift
  use_frameworks!
 
 target '21app2' do
 	
-	pod 'Alamofire', '~> 3.0'
+	pod 'Alamofire', '~> 4.0'
  	pod 'SwiftyJSON', :git => 'https://github.com/SwiftyJSON/SwiftyJSON.git'
-    pod 'UIColor_Hex_Swift', '~> 1.8'
-    pod "QRCode", "~> 0.5"
-    pod 'QRCodeReader.swift', '~> 5.3.1'
+    pod 'UIColor_Hex_Swift'
+    pod 'QRCode', :git => 'https://github.com/aschuch/QRCode'
+    pod 'QRCodeReader.swift'
 
 end
 

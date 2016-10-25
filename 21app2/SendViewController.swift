@@ -27,17 +27,17 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SendViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
 
     }
 
-    @IBAction func cancel(sender: AnyObject) {
+    @IBAction func cancel(_ sender: AnyObject) {
 
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func send(sender: AnyObject) {
+    @IBAction func send(_ sender: AnyObject) {
         let headers = [
             "Content-Type": "application/json"
         ]
@@ -45,14 +45,14 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         let amount:Int? = Int(amountField.text!)
         
         let parameters : [String : AnyObject] = [
-            "address": self.addressField.text!,
-            "amount": amount!,
-            "code":MyVariables.auth,
+            "address": self.addressField.text! as AnyObject,
+            "amount": amount! as AnyObject,
+            "code":MyVariables.auth as AnyObject,
         ]
         
         LoadingOverlay.shared.showOverlay(self.view)
         
-        Alamofire.request(.POST, MyVariables.url + "/send", parameters: parameters, encoding: .JSON, headers: headers).responseJSON { response in
+        Alamofire.request(.POST, MyVariables.url + "/send", parameters: parameters, encoding: .json, headers: headers).responseJSON { response in
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
@@ -73,7 +73,7 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
     
     lazy var reader = QRCodeReaderViewController(metadataObjectTypes: [AVMetadataObjectTypeQRCode])
     
-    @IBAction func scanAction(sender: AnyObject) {
+    @IBAction func scanAction(_ sender: AnyObject) {
         // Retrieve the QRCode content
         // By using the delegate pattern
         reader.delegate = self
@@ -87,8 +87,8 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         }
         
         // Presents the reader as modal form sheet
-        reader.modalPresentationStyle = .FormSheet
-        presentViewController(reader, animated: true, completion: nil)
+        reader.modalPresentationStyle = .formSheet
+        present(reader, animated: true, completion: nil)
     }
     
     //Calls this function when the tap is recognized.
@@ -97,22 +97,22 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         view.endEditing(true)
     }
     
-    func presentAlert(alert: String){
-        let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+    func presentAlert(_ alert: String){
+        let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     
     // MARK: - QRCodeReader Delegate Methods
     
-    func reader(reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    func reader(_ reader: QRCodeReaderViewController, didScanResult result: QRCodeReaderResult) {
+        self.dismiss(animated: true, completion: nil)
     }
     
-    func readerDidCancel(reader: QRCodeReaderViewController) {
+    func readerDidCancel(_ reader: QRCodeReaderViewController) {
         print("here");
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     
@@ -121,21 +121,21 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         // Dispose of any resources that can be recreated.
     }
     
-    override func viewDidAppear(animated: Bool) {
-        let defaults = NSUserDefaults.standardUserDefaults()
+    override func viewDidAppear(_ animated: Bool) {
+        let defaults = UserDefaults.standard
         var endArr: [NSString] = [NSString]()
         var test = []
         
-        if let test : AnyObject? = defaults.objectForKey("test") {
+        if let test : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
             if (test != nil && test!.count > 0){
-                var endpoints = defaults.objectForKey("test") as! NSArray
+                let endpoints = defaults.object(forKey: "test") as! NSArray
                 print("here")
                 self.url = endpoints[0] as! String
             }
         }
     }
     
-    func textFieldShouldReturn(textField: UITextField!) -> Bool {   //delegate method
+    func textFieldShouldReturn(_ textField: UITextField!) -> Bool {   //delegate method
         textField.resignFirstResponder()
         return true
     }

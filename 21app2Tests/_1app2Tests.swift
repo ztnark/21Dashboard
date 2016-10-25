@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import _1app2
+@testable import 21app2
 
 class _1app2Tests: XCTestCase {
     
@@ -28,7 +28,7 @@ class _1app2Tests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }

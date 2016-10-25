@@ -32,7 +32,7 @@ class ViewController: UIViewController {
     @IBOutlet var mineBtn: UIButton!
     @IBOutlet var flushBtn: UIButton!
     var splashScreen: UIImageView?
-    var numberFormatter = NSNumberFormatter()
+    var numberFormatter = NumberFormatter()
     var alamoFireManager : Alamofire.Manager?
     var url = ""
     var auth = ""
@@ -42,16 +42,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        var screenRect = UIScreen.mainScreen().bounds
+        var screenRect = UIScreen.main.bounds
         var screenWidth = screenRect.size.width
         var screenHeight = screenRect.size.height
         
-        numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
+        numberFormatter.numberStyle = NumberFormatter.Style.decimal
         self.splashScreen = UIImageView(image: UIImage(named: "SplashScreen"))
         
         self.splashScreen?.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
        self.view.addSubview(splashScreen!)
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30 // seconds
         self.alamoFireManager = Alamofire.Manager(configuration: configuration)
 
@@ -59,7 +59,7 @@ class ViewController: UIViewController {
     }
     
     
-    func get21Data(url: String){
+    func get21Data(_ url: String){
         let headers = [
             "Content-Type": "application/json"
         ]
@@ -67,16 +67,16 @@ class ViewController: UIViewController {
         print(MyVariables.auth)
         self.alamoFireManager!.request(.GET, MyVariables.url + "/dashboard", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
             switch response.result {
-            case .Success(let data):
+            case .success(let data):
             //LoadingOverlay.shared.hideOverlayView()
             if let value = response.result.value {
                 let json = JSON(value)
                 print("JSON: \(json)")
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
-                    self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
-                    self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
-                    self.flushingLabel.text =  self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
+                    self.onchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["onchain"].int!)
+                    self.offchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["twentyone_balance"].int!)
+                    self.flushingLabel.text =  self.numberFormatter.string(from: json["status_wallet"]["flushing"].int!)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                     var qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
@@ -89,7 +89,7 @@ class ViewController: UIViewController {
                     return
                 }
             }
-            case .Failure(let error):
+            case .failure(let error):
                 self.splashScreen!.removeFromSuperview()
                 print(error);
             }
@@ -97,47 +97,47 @@ class ViewController: UIViewController {
 
     }
     
-    func presentAlert(alert: String){
-        let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+    func presentAlert(_ alert: String){
+        let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
 
 
-    @IBAction func onchainaction(sender: AnyObject) {
-        offchainLabel.hidden = true
-        flushingLabel.hidden = true
-        onchainLabel.hidden = false
+    @IBAction func onchainaction(_ sender: AnyObject) {
+        offchainLabel.isHidden = true
+        flushingLabel.isHidden = true
+        onchainLabel.isHidden = false
         
-        offchainBtn.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        flushingBtn.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        onchainBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+        offchainBtn.setTitleColor(UIColor.gray, for: UIControlState())
+        flushingBtn.setTitleColor(UIColor.gray, for: UIControlState())
+        onchainBtn.setTitleColor(UIColor.white, for: UIControlState())
     }
     
     
-    @IBAction func offchainaction(sender: AnyObject) {
-        flushingLabel.hidden = true
-        onchainLabel.hidden = true
-        offchainLabel.hidden = false
+    @IBAction func offchainaction(_ sender: AnyObject) {
+        flushingLabel.isHidden = true
+        onchainLabel.isHidden = true
+        offchainLabel.isHidden = false
         
-        flushingBtn.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        onchainBtn.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        offchainBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+        flushingBtn.setTitleColor(UIColor.gray, for: UIControlState())
+        onchainBtn.setTitleColor(UIColor.gray, for: UIControlState())
+        offchainBtn.setTitleColor(UIColor.white, for: UIControlState())
     }
     
     
-    @IBAction func flushingaction(sender: AnyObject) {
-        onchainLabel.hidden = true
-        offchainLabel.hidden = true
-        flushingLabel.hidden = false
+    @IBAction func flushingaction(_ sender: AnyObject) {
+        onchainLabel.isHidden = true
+        offchainLabel.isHidden = true
+        flushingLabel.isHidden = false
         
-        onchainBtn.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        offchainBtn.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        flushingBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+        onchainBtn.setTitleColor(UIColor.gray, for: UIControlState())
+        offchainBtn.setTitleColor(UIColor.gray, for: UIControlState())
+        flushingBtn.setTitleColor(UIColor.white, for: UIControlState())
     }
     
-    @IBAction func mine(sender: AnyObject) {
+    @IBAction func mine(_ sender: AnyObject) {
         let headers = [
             "Content-Type": "application/json"
         ]
@@ -145,7 +145,7 @@ class ViewController: UIViewController {
         self.alamoFireManager!.request(.GET, MyVariables.url + "/mine", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
             LoadingOverlay.shared.hideOverlayView()
             switch response.result {
-            case .Success(let data):
+            case .success(let data):
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
@@ -155,9 +155,9 @@ class ViewController: UIViewController {
                 print("JSON: \(json)")
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
-                    self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
-                    self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
-                    self.flushingLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
+                    self.onchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["onchain"].int!)
+                    self.offchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["twentyone_balance"].int!)
+                    self.flushingLabel.text = self.numberFormatter.string(from: json["status_wallet"]["flushing"].int!)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                     var qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
@@ -170,14 +170,14 @@ class ViewController: UIViewController {
                 
             }
                 
-            case .Failure(let error):
+            case .failure(let error):
                 self.presentAlert(error.localizedDescription)
             }
 
         }
     }
 
-    @IBAction func flush(sender: AnyObject) {
+    @IBAction func flush(_ sender: AnyObject) {
         let headers = [
             "Content-Type": "application/json"
         ]
@@ -195,9 +195,9 @@ class ViewController: UIViewController {
                 print("JSON: \(json)")
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
-                    self.onchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["onchain"].int!)
-                    self.offchainLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["twentyone_balance"].int!)
-                    self.flushingLabel.text = self.numberFormatter.stringFromNumber(json["status_wallet"]["flushing"].int!)
+                    self.onchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["onchain"].int!)
+                    self.offchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["twentyone_balance"].int!)
+                    self.flushingLabel.text = self.numberFormatter.string(from: json["status_wallet"]["flushing"].int!)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                     var qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
@@ -218,7 +218,7 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         //self.navigationController?.navigationBar.tintColor = UIColor.whiteColor();
         var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 40, height: 40))
         var image = UIImage(named:"21co.png")
@@ -232,16 +232,16 @@ class ViewController: UIViewController {
         navigationController?.navigationBar.barTintColor = UIColor(rgba: "#000")
             //UIColor(colorLiteralRed: 205.0/255.0, green: 0.0/255.0, blue: 15.0/255.0, alpha: 1.0)
         
-        self.navigationController?.navigationBar.translucent = false
+        self.navigationController?.navigationBar.isTranslucent = false
         
-        let defaults = NSUserDefaults.standardUserDefaults()
+        let defaults = UserDefaults.standard
         var endArr: [NSString] = [NSString]()
         var test = []
 
-        if let test : AnyObject? = defaults.objectForKey("test") {
+        if let test : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
             print(test)
             if (test != nil && test!.count > 0){
-                var endpoints = defaults.objectForKey("test") as! NSArray
+                var endpoints = defaults.object(forKey: "test") as! NSArray
                 MyVariables.url = endpoints[0] as! String
                 MyVariables.auth = endpoints[1] as! String
                 get21Data(url)
@@ -253,39 +253,39 @@ class ViewController: UIViewController {
 
     }
     
-    @IBAction func settings(sender: AnyObject) {
+    @IBAction func settings(_ sender: AnyObject) {
         changePrefs()
     }
     func changePrefs(){
-        let defaults = NSUserDefaults.standardUserDefaults()
+        let defaults = UserDefaults.standard
         var endArr: [NSString] = [NSString]()
         var test = []
         
-        var alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.Alert)
+        let alert = UIAlertController(title: "New Endpoint", message: "Enter the endpoint for your 21 computer.", preferredStyle: UIAlertControllerStyle.alert)
         
-        alert.addTextFieldWithConfigurationHandler { (textField) in
+        alert.addTextField { (textField) in
             textField.placeholder = "21 Endpoint"
         }
         
-        alert.addTextFieldWithConfigurationHandler { (textField) in
-            textField.secureTextEntry = true
+        alert.addTextField { (textField) in
+            textField.isSecureTextEntry = true
             textField.placeholder = "Authorization Code"
         }
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
         
-        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler:{ (alertAction:UIAlertAction!) in
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler:{ (alertAction:UIAlertAction!) in
             let textf = alert.textFields![0] as UITextField
             let authf = alert.textFields![1] as UITextField
             MyVariables.url = textf.text!
             MyVariables.auth = authf.text!
-            endArr.append(MyVariables.url)
-            endArr.append(MyVariables.auth)
-            defaults.setObject(endArr, forKey: "test")
+            endArr.append(MyVariables.url as NSString)
+            endArr.append(MyVariables.auth as NSString)
+            defaults.set(endArr, forKey: "test")
             self.get21Data(MyVariables.url)
             
         }))
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
 
 

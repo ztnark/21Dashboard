@@ -1,0 +1,33 @@
+PODS:
+  - Alamofire (3.5.1)
+  - QRCode (0.5)
+  - QRCodeReader.swift (5.3.1)
+  - SwiftyJSON (3.1.1)
+  - UIColor_Hex_Swift (1.9)
+
+DEPENDENCIES:
+  - Alamofire (~> 3.0)
+  - QRCode (~> 0.5)
+  - QRCodeReader.swift (~> 5.3.1)
+  - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`)
+  - UIColor_Hex_Swift (~> 1.8)
+
+EXTERNAL SOURCES:
+  SwiftyJSON:
+    :git: https://github.com/SwiftyJSON/SwiftyJSON.git
+
+CHECKOUT OPTIONS:
+  SwiftyJSON:
+    :commit: 6a0c3a82e2b4a07723b4958146315c7928220189
+    :git: https://github.com/SwiftyJSON/SwiftyJSON.git
+
+SPEC CHECKSUMS:
+  Alamofire: 0dfba1184a543e2aa160f4e39cac4e8aba48d223
+  QRCode: a249ed747aeb0f4bf5f9c58b5b001b6b3bc80073
+  QRCodeReader.swift: 6aa05e4b9123f5bbbe1e7f1d5df28d590cc56775
+  SwiftyJSON: f0be2e604f83e8405a624e9f891898bf6ed4e019
+  UIColor_Hex_Swift: 2ee747c0fed8b72b2135ef474b80a6921e489daa
+
+PODFILE CHECKSUM: b71a7fa4c0bc316658759c39fda6c29a188720a3
+
+COCOAPODS: 1.1.1

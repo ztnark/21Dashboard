@@ -16,7 +16,7 @@ import QRCode
 import QRCodeReader
 import AVFoundation
 
-class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, UITextFieldDelegate {
+class SendViewController: UIViewController,UITextFieldDelegate {
 
     @IBOutlet var amountField: UITextField!
     @IBOutlet var addressField: UITextField!
@@ -32,9 +32,7 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SendViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
-        
-        read = QRCodeReader(metadataObjectTypes: [AVMetadataObjectTypeQRCode])
-        reader = QRCodeReaderViewController(builder: read)
+    
         
 
     }
@@ -60,11 +58,7 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         LoadingOverlay.shared.showOverlay(self.view)
         var url = MyVariables.url + "/send"
         
-        Alamofire.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-            print(response.request)  // original URL request
-            print(response.response) // URL response
-            print(response.data)     // server data
-            print(response.result)   // result of response serialization
+        Alamofire.request(url, method: .post,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in=
             LoadingOverlay.shared.hideOverlayView()
             
             if let value = response.result.value {
@@ -85,7 +79,7 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
     @IBAction func scanAction(_ sender: AnyObject) {
         // Retrieve the QRCode content
         // By using the delegate pattern
-        reader.delegate = self
+        reader.delegate = self as! QRCodeReaderViewControllerDelegate
         
         // Or by using the closure pattern
         reader.completionBlock = { (result: QRCodeReaderResult?) in

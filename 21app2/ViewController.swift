@@ -42,9 +42,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        var screenRect = UIScreen.main.bounds
-        var screenWidth = screenRect.size.width
-        var screenHeight = screenRect.size.height
+        let screenRect = UIScreen.main.bounds
+        let screenWidth = screenRect.size.width
+        let screenHeight = screenRect.size.height
         
         numberFormatter.numberStyle = NumberFormatter.Style.decimal
         self.splashScreen = UIImageView(image: UIImage(named: "SplashScreen"))
@@ -63,22 +63,20 @@ class ViewController: UIViewController {
         let headers = [
             "Content-Type": "application/json"
         ]
-        //LoadingOverlay.shared.showOverlay(self.view)
-        var url = MyVariables.url + "/dashboard"
-        let parameters: Parameters = ["code":MyVariables.auth]
+
+        let url = MyVariables.url + "/dashboard?code=" + MyVariables.auth
         
-        
-        
-        self.alamoFireManager!.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+        self.alamoFireManager!.request(url, method: .get,parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             switch response.result {
             case .success(let data):
             //LoadingOverlay.shared.hideOverlayView()
             if let value = response.result.value {
                 let json = JSON(value)
+                 print("JSON: \(json)")
                 let onChain = json["status_wallet"]["onchain"].int! as NSNumber
                 let balance = json["status_wallet"]["twentyone_balance"].int! as NSNumber
                 let flushing = json["status_wallet"]["flushing"].int! as NSNumber
-                print("JSON: \(json)")
+               
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
                     self.onchainLabel.text = self.numberFormatter.string(from: onChain)
@@ -103,7 +101,7 @@ class ViewController: UIViewController {
         }
 
     }
-    
+
     func presentAlert(_ alert: String){
         let alert = UIAlertController(title: "Error", message: alert, preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.default, handler: nil))
@@ -149,10 +147,9 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         LoadingOverlay.shared.showOverlay(self.view)
-        var url = MyVariables.url + "/mine"
-        let parameters: Parameters = ["code":MyVariables.auth]
+        var url = MyVariables.url + "/mine?code=" + MyVariables.auth
         
-        self.alamoFireManager!.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+        self.alamoFireManager!.request(url, method: .get,parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             LoadingOverlay.shared.hideOverlayView()
             switch response.result {
             case .success(let data):
@@ -195,24 +192,20 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         LoadingOverlay.shared.showOverlay(self.view)
-        var url = MyVariables.url + "/flush"
-        let parameters: Parameters = ["code":MyVariables.auth]
+        var url = MyVariables.url + "/flush?code=" + MyVariables.auth
         
-        self.alamoFireManager!.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-            print(response.request)  // original URL request
-            print(response.response) // URL response
-            print(response.data)     // server data
-            print(response.result)   // result of response serialization
+        self.alamoFireManager!.request(url, method: .get,parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+
             LoadingOverlay.shared.hideOverlayView()
             
             if let value = response.result.value {
                 
                 let json = JSON(value)
-                print("JSON: \(json)")
+
                 let onChain = json["status_wallet"]["onchain"].int! as NSNumber
                 let balance = json["status_wallet"]["twentyone_balance"].int! as NSNumber
                 let flushing = json["status_wallet"]["flushing"].int! as NSNumber
-                print("JSON: \(json)")
+
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
                     self.onchainLabel.text = self.numberFormatter.string(from: onChain)

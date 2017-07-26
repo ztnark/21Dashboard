@@ -16,15 +16,21 @@ import QRCode
 import QRCodeReader
 import AVFoundation
 
-class SendViewController: UIViewController,UITextFieldDelegate {
+class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, UITextFieldDelegate {
 
     @IBOutlet var amountField: UITextField!
     @IBOutlet var addressField: UITextField!
     
     var address = ""
     var url = ""
-    var read: QRCodeReader!
-    var reader: QRCodeReaderViewController!
+    
+    lazy var readerVC: QRCodeReaderViewController = {
+        let builder = QRCodeReaderViewControllerBuilder {
+            $0.reader = QRCodeReader(metadataObjectTypes: [AVMetadataObjectTypeQRCode], captureDevicePosition: .back)
+        }
+        
+        return QRCodeReaderViewController(builder: builder)
+    }()
 
     
     override func viewDidLoad() {
@@ -32,9 +38,7 @@ class SendViewController: UIViewController,UITextFieldDelegate {
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SendViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
-    
         
-
     }
 
     @IBAction func cancel(_ sender: AnyObject) {
@@ -77,12 +81,14 @@ class SendViewController: UIViewController,UITextFieldDelegate {
     
     
     @IBAction func scanAction(_ sender: AnyObject) {
+        guard checkScanPermissions() else { return }
+
         // Retrieve the QRCode content
         // By using the delegate pattern
-        reader.delegate = self as! QRCodeReaderViewControllerDelegate
+        readerVC.delegate = self as! QRCodeReaderViewControllerDelegate
         
         // Or by using the closure pattern
-        reader.completionBlock = { (result: QRCodeReaderResult?) in
+        readerVC.completionBlock = { (result: QRCodeReaderResult?) in
             self.address = result!.value
             
             self.addressField.text = self.address
@@ -90,8 +96,8 @@ class SendViewController: UIViewController,UITextFieldDelegate {
         }
         
         // Presents the reader as modal form sheet
-        reader.modalPresentationStyle = .formSheet
-        present(reader, animated: true, completion: nil)
+        readerVC.modalPresentationStyle = .formSheet
+        present(readerVC, animated: true, completion: nil)
     }
     
     //Calls this function when the tap is recognized.
@@ -113,11 +119,51 @@ class SendViewController: UIViewController,UITextFieldDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
+    
+    func reader(_ reader: QRCodeReaderViewController, didSwitchCamera newCaptureDevice: AVCaptureDeviceInput) {
+        if let cameraName = newCaptureDevice.device.localizedName {
+            print("Switching capturing to: \(cameraName)")
+        }
+    }
+    
     func readerDidCancel(_ reader: QRCodeReaderViewController) {
         print("here");
         self.dismiss(animated: true, completion: nil)
     }
     
+    private func checkScanPermissions() -> Bool {
+        do {
+            return try QRCodeReader.supportsMetadataObjectTypes()
+        } catch let error as NSError {
+            let alert: UIAlertController?
+            
+            switch error.code {
+            case -11852:
+                alert = UIAlertController(title: "Error", message: "This app is not authorized to use Back Camera.", preferredStyle: .alert)
+                
+                alert?.addAction(UIAlertAction(title: "Setting", style: .default, handler: { (_) in
+                    DispatchQueue.main.async {
+                        if let settingsURL = URL(string: UIApplicationOpenSettingsURLString) {
+                            UIApplication.shared.openURL(settingsURL)
+                        }
+                    }
+                }))
+                
+                alert?.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            case -11814:
+                alert = UIAlertController(title: "Error", message: "Reader not supported by the current device", preferredStyle: .alert)
+                alert?.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            default:
+                alert = nil
+            }
+            
+            guard let vc = alert else { return false }
+            
+            present(vc, animated: true, completion: nil)
+            
+            return false
+        }
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

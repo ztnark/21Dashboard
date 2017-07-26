@@ -33,7 +33,7 @@ class ViewController: UIViewController {
     @IBOutlet var flushBtn: UIButton!
     var splashScreen: UIImageView?
     var numberFormatter = NumberFormatter()
-    var alamoFireManager : Alamofire.Manager?
+    var alamoFireManager : Alamofire.SessionManager?
     var url = ""
     var auth = ""
     
@@ -53,7 +53,7 @@ class ViewController: UIViewController {
        self.view.addSubview(splashScreen!)
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30 // seconds
-        self.alamoFireManager = Alamofire.Manager(configuration: configuration)
+        self.alamoFireManager = Alamofire.SessionManager(configuration: configuration)
 
         
     }
@@ -64,19 +64,26 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         //LoadingOverlay.shared.showOverlay(self.view)
-        print(MyVariables.auth)
-        self.alamoFireManager!.request(.GET, MyVariables.url + "/dashboard", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
+        var url = MyVariables.url + "/dashboard"
+        let parameters: Parameters = ["code":MyVariables.auth]
+        
+        
+        
+        self.alamoFireManager!.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             switch response.result {
             case .success(let data):
             //LoadingOverlay.shared.hideOverlayView()
             if let value = response.result.value {
                 let json = JSON(value)
+                let onChain = json["status_wallet"]["onchain"].int! as NSNumber
+                let balance = json["status_wallet"]["twentyone_balance"].int! as NSNumber
+                let flushing = json["status_wallet"]["flushing"].int! as NSNumber
                 print("JSON: \(json)")
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
-                    self.onchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["onchain"].int!)
-                    self.offchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["twentyone_balance"].int!)
-                    self.flushingLabel.text =  self.numberFormatter.string(from: json["status_wallet"]["flushing"].int!)
+                    self.onchainLabel.text = self.numberFormatter.string(from: onChain)
+                    self.offchainLabel.text = self.numberFormatter.string(from: balance)
+                    self.flushingLabel.text =  self.numberFormatter.string(from: flushing)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                     var qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
@@ -142,7 +149,10 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         LoadingOverlay.shared.showOverlay(self.view)
-        self.alamoFireManager!.request(.GET, MyVariables.url + "/mine", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
+        var url = MyVariables.url + "/mine"
+        let parameters: Parameters = ["code":MyVariables.auth]
+        
+        self.alamoFireManager!.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             LoadingOverlay.shared.hideOverlayView()
             switch response.result {
             case .success(let data):
@@ -152,12 +162,15 @@ class ViewController: UIViewController {
             print(response.result)   // result of response serialization
             if let value = response.result.value {
                 let json = JSON(value)
+                let onChain = json["status_wallet"]["onchain"].int! as NSNumber
+                let balance = json["status_wallet"]["twentyone_balance"].int! as NSNumber
+                let flushing = json["status_wallet"]["flushing"].int! as NSNumber
                 print("JSON: \(json)")
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
-                    self.onchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["onchain"].int!)
-                    self.offchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["twentyone_balance"].int!)
-                    self.flushingLabel.text = self.numberFormatter.string(from: json["status_wallet"]["flushing"].int!)
+                    self.onchainLabel.text = self.numberFormatter.string(from: onChain)
+                    self.offchainLabel.text = self.numberFormatter.string(from: balance)
+                    self.flushingLabel.text = self.numberFormatter.string(from: flushing)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                     var qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
@@ -182,7 +195,10 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         LoadingOverlay.shared.showOverlay(self.view)
-        self.alamoFireManager!.request(.GET, MyVariables.url + "/flush", parameters: ["code":MyVariables.auth], headers: headers).responseJSON { response in
+        var url = MyVariables.url + "/flush"
+        let parameters: Parameters = ["code":MyVariables.auth]
+        
+        self.alamoFireManager!.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
@@ -193,11 +209,15 @@ class ViewController: UIViewController {
                 
                 let json = JSON(value)
                 print("JSON: \(json)")
+                let onChain = json["status_wallet"]["onchain"].int! as NSNumber
+                let balance = json["status_wallet"]["twentyone_balance"].int! as NSNumber
+                let flushing = json["status_wallet"]["flushing"].int! as NSNumber
+                print("JSON: \(json)")
                 if response.response!.statusCode == 200 {
                     self.addressLabel.text = json["status_account"]["address"].stringValue
-                    self.onchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["onchain"].int!)
-                    self.offchainLabel.text = self.numberFormatter.string(from: json["status_wallet"]["twentyone_balance"].int!)
-                    self.flushingLabel.text = self.numberFormatter.string(from: json["status_wallet"]["flushing"].int!)
+                    self.onchainLabel.text = self.numberFormatter.string(from: onChain)
+                    self.offchainLabel.text = self.numberFormatter.string(from: balance)
+                    self.flushingLabel.text = self.numberFormatter.string(from: flushing)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
                     var qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
@@ -229,14 +249,14 @@ class ViewController: UIViewController {
         
         self.navigationItem.titleView = headerView
         
-        navigationController?.navigationBar.barTintColor = UIColor(rgba: "#000")
+        navigationController?.navigationBar.barTintColor = UIColor.black
             //UIColor(colorLiteralRed: 205.0/255.0, green: 0.0/255.0, blue: 15.0/255.0, alpha: 1.0)
         
         self.navigationController?.navigationBar.isTranslucent = false
         
         let defaults = UserDefaults.standard
         var endArr: [NSString] = [NSString]()
-        var test = []
+        var test = [AnyObject?]()
 
         if let test : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
             print(test)

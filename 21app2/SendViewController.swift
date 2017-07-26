@@ -23,12 +23,19 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
     
     var address = ""
     var url = ""
+    var read: QRCodeReader!
+    var reader: QRCodeReaderViewController!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SendViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        
+        read = QRCodeReader(metadataObjectTypes: [AVMetadataObjectTypeQRCode])
+        reader = QRCodeReaderViewController(builder: read)
+        
 
     }
 
@@ -51,8 +58,9 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         ]
         
         LoadingOverlay.shared.showOverlay(self.view)
+        var url = MyVariables.url + "/send"
         
-        Alamofire.request(.POST, MyVariables.url + "/send", parameters: parameters, encoding: .json, headers: headers).responseJSON { response in
+        Alamofire.request(url, method: .get,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             print(response.request)  // original URL request
             print(response.response) // URL response
             print(response.data)     // server data
@@ -71,7 +79,8 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
         }
     }
     
-    lazy var reader = QRCodeReaderViewController(metadataObjectTypes: [AVMetadataObjectTypeQRCode])
+//    lazy var reader = QRCodeReaderViewController(metadataObjectTypes: [AVMetadataObjectTypeQRCode])
+    
     
     @IBAction func scanAction(_ sender: AnyObject) {
         // Retrieve the QRCode content
@@ -124,7 +133,7 @@ class SendViewController: UIViewController, QRCodeReaderViewControllerDelegate, 
     override func viewDidAppear(_ animated: Bool) {
         let defaults = UserDefaults.standard
         var endArr: [NSString] = [NSString]()
-        var test = []
+        var test:[AnyObject] = []
         
         if let test : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
             if (test != nil && test!.count > 0){

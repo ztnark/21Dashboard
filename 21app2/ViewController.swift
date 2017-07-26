@@ -68,7 +68,7 @@ class ViewController: UIViewController {
         
         self.alamoFireManager!.request(url, method: .get,parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             switch response.result {
-            case .success(let data):
+            case .success(_):
             //LoadingOverlay.shared.hideOverlayView()
             if let value = response.result.value {
                 let json = JSON(value)
@@ -83,13 +83,13 @@ class ViewController: UIViewController {
                     self.offchainLabel.text = self.numberFormatter.string(from: balance)
                     self.flushingLabel.text =  self.numberFormatter.string(from: flushing)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
-                    var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                    let qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
                     self.splashScreen!.removeFromSuperview()
 
                 }
                 else if response.response!.statusCode == 401 {
-                    var text = json["text"].stringValue
+                    let text = json["text"].stringValue
                     self.presentAlert(text)
                     return
                 }
@@ -147,16 +147,13 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         LoadingOverlay.shared.showOverlay(self.view)
-        var url = MyVariables.url + "/mine?code=" + MyVariables.auth
+        let url = MyVariables.url + "/mine?code=" + MyVariables.auth
         
         self.alamoFireManager!.request(url, method: .get,parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             LoadingOverlay.shared.hideOverlayView()
             switch response.result {
-            case .success(let data):
-            print(response.request)  // original URL request
-            print(response.response) // URL response
-            print(response.data)     // server data
-            print(response.result)   // result of response serialization
+            case .success(_):
+
             if let value = response.result.value {
                 let json = JSON(value)
                 let onChain = json["status_wallet"]["onchain"].int! as NSNumber
@@ -169,11 +166,11 @@ class ViewController: UIViewController {
                     self.offchainLabel.text = self.numberFormatter.string(from: balance)
                     self.flushingLabel.text = self.numberFormatter.string(from: flushing)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
-                    var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                    let qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
                 }
                 else if response.response!.statusCode == 401 {
-                    var text = json["text"].stringValue
+                    let text = json["text"].stringValue
                     self.presentAlert(text)
                     return
                 }
@@ -192,7 +189,7 @@ class ViewController: UIViewController {
             "Content-Type": "application/json"
         ]
         LoadingOverlay.shared.showOverlay(self.view)
-        var url = MyVariables.url + "/flush?code=" + MyVariables.auth
+        let url = MyVariables.url + "/flush?code=" + MyVariables.auth
         
         self.alamoFireManager!.request(url, method: .get,parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
 
@@ -212,11 +209,11 @@ class ViewController: UIViewController {
                     self.offchainLabel.text = self.numberFormatter.string(from: balance)
                     self.flushingLabel.text = self.numberFormatter.string(from: flushing)
                     self.hashrateLabel.text = json["status_mining"]["hashrate"].stringValue
-                    var qrCode = QRCode(json["status_account"]["address"].stringValue)
+                    let qrCode = QRCode(json["status_account"]["address"].stringValue)
                     self.qrImage.image = qrCode?.image
                 }
                 else if response.response!.statusCode == 401 {
-                    var text = json["text"].stringValue
+                    let text = json["text"].stringValue
                     self.presentAlert(text)
                     return
                 }
@@ -233,9 +230,9 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         //self.navigationController?.navigationBar.tintColor = UIColor.whiteColor();
-        var headerView = UIView(frame:CGRect(x: 0, y: 0, width: 40, height: 40))
-        var image = UIImage(named:"21co.png")
-        var imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        let headerView = UIView(frame:CGRect(x: 0, y: 0, width: 40, height: 40))
+        let image = UIImage(named:"21co.png")
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
         imageView.image = image
         
         headerView.addSubview(imageView)
@@ -248,13 +245,10 @@ class ViewController: UIViewController {
         self.navigationController?.navigationBar.isTranslucent = false
         
         let defaults = UserDefaults.standard
-        var endArr: [NSString] = [NSString]()
-        var test = [AnyObject?]()
 
-        if let test : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
-            print(test)
-            if (test != nil && test!.count > 0){
-                var endpoints = defaults.object(forKey: "test") as! NSArray
+        if let userData : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
+            if (userData != nil && userData!.count > 0){
+                let endpoints = defaults.object(forKey: "test") as! NSArray
                 MyVariables.url = endpoints[0] as! String
                 MyVariables.auth = endpoints[1] as! String
                 get21Data(url)

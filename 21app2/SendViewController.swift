@@ -56,16 +56,16 @@ class SendViewController: UIViewController,UITextFieldDelegate {
         ]
         
         LoadingOverlay.shared.showOverlay(self.view)
-        var url = MyVariables.url + "/send"
+        let url = MyVariables.url + "/send"
         
-        Alamofire.request(url, method: .post,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in=
+        Alamofire.request(url, method: .post,parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             LoadingOverlay.shared.hideOverlayView()
             
             if let value = response.result.value {
                 let json = JSON(value)
                 print("JSON: \(json)")
                 if response.response!.statusCode == 401 {
-                    var text = json["text"].stringValue
+                    let text = json["text"].stringValue
                     self.presentAlert(text)
                 }
             }
@@ -126,13 +126,10 @@ class SendViewController: UIViewController,UITextFieldDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         let defaults = UserDefaults.standard
-        var endArr: [NSString] = [NSString]()
-        var test:[AnyObject] = []
         
-        if let test : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
-            if (test != nil && test!.count > 0){
+        if let userData : AnyObject? = defaults.object(forKey: "test") as AnyObject?? {
+            if (userData != nil && userData!.count > 0){
                 let endpoints = defaults.object(forKey: "test") as! NSArray
-                print("here")
                 self.url = endpoints[0] as! String
             }
         }
